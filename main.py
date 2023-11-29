@@ -1,77 +1,141 @@
 import pygame 
+import sys
 from game import Game
+from bottom_boxes import draw_bottom_boxes
+from arrow import Arrow
+import random
 
 
 pygame.init()
-screen = pygame.display.set_mode((1200,800))
 
-pygame.display.set_caption("Dance Dance Revolution")
+# Get the user's display info
+info_object = pygame.display.Info()
+screen_width = info_object.current_w
+screen_height = info_object.current_h
+
+# Define the relative screen size percentages
+relative_width_percentage = 1
+relative_height_percentage = 1
+
+# Calculate the relative screen size
+relative_width = int(screen_width * relative_width_percentage)
+relative_height = int(screen_height * relative_height_percentage)
+
+# Set up the screen
+screen = pygame.display.set_mode((relative_width, relative_height))
+pygame.display.set_caption('Code Code Revolution Hero')
+
+# Create clock and font objects
 clock = pygame.time.Clock()
-test_font = pygame.font.Font(None,50)
+test_font = pygame.font.Font(None, 50)
 
+#IMPORT SONG 
+pygame.mixer.music.load('Sandstorm2.mp3')
+pygame.mixer.music.set_volume(0.1)
+
+
+# Create a background surface and load images
+background_surface = pygame.Surface((relative_width, relative_height))
 
 left_arrow = pygame.image.load("arrowLeft.png").convert_alpha()
 up_arrow = pygame.image.load('arrowUp.png').convert_alpha()
 right_arrow = pygame.image.load("arrowRight.png").convert_alpha()
 down_arrow = pygame.image.load("arrowDown.png").convert_alpha()
 
+monkey = pygame.image.load('monkeywin.png').convert_alpha
 
-background_surface = pygame.Surface((1200,800))
-background_surface.fill('Black')
+background_image = pygame.image.load('DDDR.png').convert()
+background_image = pygame.transform.scale(background_image, (relative_width, relative_height))
 
+background_surface.blit(background_image, (0, 0))
 
-text_surface = test_font.render("Code Code Revolution Hero",False, "Black")
-
-text_rect = text_surface.get_rect(center = (600,50))
-
-# penguin_surface = pygame.image.load("newguy.jpeg").convert_alpha()
-up_arrow_position = 500
-down_arrow_position = 300
-left_arrow_position = 600
-right_arrow_position = 400
+text_surface = test_font.render("Code Code Revolution Hero",False, "black")
 
 
-keys = pygame.key.get_pressed()
+text_rect = text_surface.get_rect(center = (700,50))
+
+left_arrow_position = 0
+up_arrow_position = 0
+down_arrow_position = 0
+right_arrow_position = 0
+
+# BOTTOM BOXES
+
+#START BUTTON 
+start_button = pygame.Rect(relative_width // 2 - 100, relative_height // 2 - 50, 200, 100)
+game_started = False
+
+score = 0
 running = True
+
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        
-        elif keys[pygame.K_UP]:
-                up_arrow_rect = pygame.Rect(500, up_arrow_position)
-                print("")
-        if keys[pygame.K_RIGHT]:
-             print("")
-        if keys[pygame.K_DOWN]:
-             print("")
-        if keys[pygame.K_LEFT]:
-             print("")
-       
+
+        elif event.type == pygame.KEYDOWN and game_started:
+
+            if event.key==pygame.K_UP:
+                score += 1
+
+            elif event.key==pygame.K_RIGHT:
+             score += 1 
              
+            elif event.key==pygame.K_DOWN:
+             score += 1 
+                
+            elif event.key==pygame.K_LEFT:
+             score += 1
+
+        elif event.type == pygame.MOUSEBUTTONDOWN and start_button.collidepoint(event.pos):
+            game_started = True
+            pygame.mixer.music.play()
+
         
-        
+             
+    bottom_arrow_rects = []
             
     screen.blit(background_surface,(0,0))
 
+    #SPEED IN WHICH ARROWS FALL
     up_arrow_position += 4
     down_arrow_position += 4
-    left_arrow_position += 4 
+    left_arrow_position += 4
     right_arrow_position += 4
+
+
+    #DRAWING START BUTTON
+    if not game_started:
+        
+        pygame.draw.rect(screen, 'black', start_button)
+        start_text = test_font.render("Start", True, 'blue')
+        screen.blit(start_text, (start_button.x + 50, start_button.y + 30))
+
+
+    #position of top arrows on screen
+    if left_arrow_position > screen_height:
+        left_arrow_position = -100
+
+    if up_arrow_position > screen_height:
+        up_arrow_position = -100
+
+    if right_arrow_position > screen_height:
+        right_arrow_position = -100
+
+    if down_arrow_position > screen_height:
+        down_arrow_position = -100
+
+
+
+
+    screen.blit(left_arrow, (150, left_arrow_position))
+    screen.blit(up_arrow, (500, up_arrow_position))
+    screen.blit(down_arrow, (850, down_arrow_position))
+    screen.blit(right_arrow, (1200, right_arrow_position))
+
+
     
-    if left_arrow_position > 1000: left_arrow_position = -100
-    screen.blit(left_arrow, (300, left_arrow_position))
-
-    if up_arrow_position >1000: up_arrow_position = -100
-    screen.blit(up_arrow,(400,up_arrow_position))
-    
-
-    if right_arrow_position > 1000: right_arrow_position = -100
-    screen.blit(right_arrow,(500,right_arrow_position))
-
-    if down_arrow_position > 1000: down_arrow_position = -100
-    screen.blit(down_arrow,(600,down_arrow_position))
 
    
     screen.blit(text_surface,text_rect) 
@@ -79,8 +143,19 @@ while running:
     pygame.draw.rect(screen, 'Pink', text_rect,10)
     screen.blit(text_surface,text_rect)
 
+    
+    BOTTOM_ARROW_COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
 
-   
+    draw_bottom_boxes(screen, screen_width, screen_height, BOTTOM_ARROW_COLORS)
+    WHITE = (255, 255, 255)
+    BLACK = (0, 0, 0)
+
+
+    
+    font = pygame.font.Font(None, 36)
+    score_text = font.render("Score: {}".format(score), True, 'black')
+    screen.blit(score_text, (10, 10))
+
     
     
     pygame.display.update()
@@ -90,6 +165,9 @@ while running:
 
 
 pygame.quit()
+
+
+
 
 
 
