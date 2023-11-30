@@ -1,6 +1,5 @@
 import pygame 
 import sys
-from game import Game
 from bottom_boxes import draw_bottom_boxes
 from arrow import Arrow
 import random
@@ -57,8 +56,7 @@ down_arrow = pygame.image.load("arrowDown.png").convert_alpha()
 start_button_img = pygame.image.load('start3.png')
 button_pos = (screen_width // 2 - start_button_img.get_width() // 2, screen_height // 2 - start_button_img.get_height() // 2)
 
-caption_img = pygame.image.load('codecode.png')
-caption_pos = (screen_width // 2 - caption_img.get_width() // 2, 50)
+
 
 
 
@@ -87,6 +85,8 @@ up_arrow_speed = random.randint(2, 6)
 
 difficulty = 1
 
+
+
 while running:
 
     
@@ -95,12 +95,15 @@ while running:
 
     if not game_started:
         
+        caption_img = pygame.image.load('codecode.png')
+        caption_pos = (screen_width // 2 - caption_img.get_width() // 2, 50)
+        screen.blit(caption_img,caption_pos)
         screen.blit(start_button_img, button_pos)
         
         
 
     else:
-
+        screen.blit(score_text, (x_centered, y_top))
         
         left_arrow_position += left_arrow_speed
         up_arrow_position += up_arrow_speed
@@ -128,20 +131,29 @@ while running:
         screen.blit(down_arrow, (850, down_arrow_position))
         screen.blit(right_arrow, (1200, right_arrow_position))
 
-    screen.blit(caption_img,caption_pos)
+    
     # pygame.draw.rect(screen, 'Pink', text_rect)
     # pygame.draw.rect(screen, 'Pink', text_rect,10)
     
 
-    BOTTOM_ARROW_COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
+    BOTTOM_ARROW_COLORS = ['dark green', 'purple', (0, 0, 255), (255, 255, 0)]
     rectangles = draw_bottom_boxes(screen, screen_width, screen_height, BOTTOM_ARROW_COLORS, 8)
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
 
-    font = pygame.font.Font(None, 36)
-    score_text = font.render("Score: {}".format(score), True, 'white')
-    screen.blit(score_text, (10, 10))
+    font_path = "nova.ttf" 
+    font = pygame.font.Font(font_path, 72)
+    score_text = font.render("Score: {}".format(score), True, 'pink')
 
+    score_text_width, score_text_height = font.size("Score: {}".format(score))
+    x_centered = (screen_width - score_text_width) // 2
+    y_top = 20
+    
+
+    left_arrow_collided = False
+    up_arrow_collided = False
+    right_arrow_collided = False
+    down_arrow_collided = False
     
 
     
@@ -150,6 +162,8 @@ while running:
             running = False
 
         elif event.type == pygame.KEYDOWN and game_started:
+            
+            
 
             if event.key==pygame.K_UP and rectangles[1].collidepoint((500, up_arrow_position)):
                 score += 1
@@ -168,7 +182,9 @@ while running:
              difficulty += .1
 
         elif event.type == pygame.MOUSEBUTTONDOWN and start_button.collidepoint(event.pos):
+            
             game_started = True
+            
             pygame.mixer.music.play()
 
 
