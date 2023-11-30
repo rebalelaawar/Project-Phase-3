@@ -1,6 +1,6 @@
 import pygame
 
-def draw_bottom_boxes(screen, screen_width, screen_height, BOTTOM_ARROW_COLORS):
+def draw_bottom_boxes(screen, screen_width, screen_height, BOTTOM_ARROW_COLORS, border):
     bottom_arrow_width = 300
     bottom_arrow_height = 225
     bottom_arrow_spacing = 250
@@ -19,10 +19,8 @@ def draw_bottom_boxes(screen, screen_width, screen_height, BOTTOM_ARROW_COLORS):
 
     for i, color in enumerate(BOTTOM_ARROW_COLORS):
         arrow_rect = pygame.Rect(bottom_arrow_x_positions[i], bottom_arrow_y, bottom_arrow_width, bottom_arrow_height)
-        pygame.draw.rect(screen, color, arrow_rect)
+        pygame.draw.rect(screen, color, arrow_rect,border)
         bottom_arrow_rects.append(arrow_rect)
 
     return bottom_arrow_rects
     
-
-

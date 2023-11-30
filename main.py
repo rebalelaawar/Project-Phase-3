@@ -8,6 +8,7 @@ import random
 
 pygame.init()
 
+print("START")
 # Get the user's display info
 info_object = pygame.display.Info()
 screen_width = info_object.current_w
@@ -42,6 +43,10 @@ up_arrow = pygame.image.load('arrowUp.png').convert_alpha()
 right_arrow = pygame.image.load("arrowRight.png").convert_alpha()
 down_arrow = pygame.image.load("arrowDown.png").convert_alpha()
 
+left_rect = left_arrow.get_rect()
+up_rect = up_arrow.get_rect()
+
+
 monkey = pygame.image.load('monkeywin.png').convert_alpha
 
 background_image = pygame.image.load('DDDR.png').convert()
@@ -70,31 +75,8 @@ running = True
 
 
 while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
 
-        elif event.type == pygame.KEYDOWN and game_started:
 
-            if event.key==pygame.K_UP:
-                score += 1
-
-            elif event.key==pygame.K_RIGHT:
-             score += 1 
-             
-            elif event.key==pygame.K_DOWN:
-             score += 1 
-                
-            elif event.key==pygame.K_LEFT:
-             score += 1
-
-        elif event.type == pygame.MOUSEBUTTONDOWN and start_button.collidepoint(event.pos):
-            game_started = True
-            pygame.mixer.music.play()
-
-        
-             
-    bottom_arrow_rects = []
             
     screen.blit(background_surface,(0,0))
 
@@ -145,8 +127,8 @@ while running:
 
     
     BOTTOM_ARROW_COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
-
-    draw_bottom_boxes(screen, screen_width, screen_height, BOTTOM_ARROW_COLORS)
+    rectangles = draw_bottom_boxes(screen, screen_width, screen_height, BOTTOM_ARROW_COLORS, 8)
+    
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
 
@@ -156,6 +138,31 @@ while running:
     score_text = font.render("Score: {}".format(score), True, 'black')
     screen.blit(score_text, (10, 10))
 
+    difficulty = 1 
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        elif event.type == pygame.KEYDOWN and game_started:
+
+            # if event.key==pygame.K_UP and any([rectangles[i].collidepoint((500, up_arrow_position)) for i in range(0,4)]):
+            if event.key==pygame.K_UP and rectangles[1].collidepoint((500, up_arrow_position)):
+                score += 1
+                
+
+            elif event.key==pygame.K_RIGHT and rectangles[3].collidepoint((1200, right_arrow_position)):
+             score += 1 
+             
+            elif event.key==pygame.K_DOWN and rectangles[2].collidepoint((850, down_arrow_position)):
+             score += 1 
+                
+            elif event.key==pygame.K_LEFT and rectangles[0].collidepoint((150, left_arrow_position)):
+             score += 1
+
+        elif event.type == pygame.MOUSEBUTTONDOWN and start_button.collidepoint(event.pos):
+            game_started = True
+            pygame.mixer.music.play()
     
     
     pygame.display.update()
@@ -165,9 +172,5 @@ while running:
 
 
 pygame.quit()
-
-
-
-
 
 
