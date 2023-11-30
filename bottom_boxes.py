@@ -1,11 +1,11 @@
 import pygame
 
 def draw_bottom_boxes(screen, screen_width, screen_height, BOTTOM_ARROW_COLORS, border):
-    bottom_arrow_width = 300
-    bottom_arrow_height = 225
+    bottom_arrow_width = 200
+    bottom_arrow_height = 155
     bottom_arrow_spacing = 250
 
-    bottom_arrow_y = screen_height - bottom_arrow_height - 10  # Y position for boxes
+    bottom_arrow_y = screen_height - bottom_arrow_height - 175 # Y position for boxes
 
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
