@@ -1,8 +1,12 @@
 import pygame 
 import sys
+
 from bottom_boxes import draw_bottom_boxes
 from arrow import Arrow
 import random
+from quit_button import QuitButton
+from lives_tracker import LivesTracker
+
 
 
 pygame.init()
@@ -59,7 +63,6 @@ button_pos = (screen_width // 2 - start_button_img.get_width() // 2, screen_heig
 
 
 
-
 background_image = pygame.image.load('Space_Background3.png').convert()
 background_image = pygame.transform.scale(background_image, (relative_width, relative_height))
 
@@ -85,15 +88,21 @@ up_arrow_speed = random.randint(2, 6)
 
 difficulty = 1
 
+quit_button = QuitButton(screen)
+lives_tracker = LivesTracker(screen)
+
+
+left_scored = False
+right_scored = False
+down_scored = False
+up_scored = False
 
 
 while running:
-
-    
-
     screen.blit(background_surface,(0,0))
 
     if not game_started:
+        
         
         caption_img = pygame.image.load('codecode.png')
         caption_pos = (screen_width // 2 - caption_img.get_width() // 2, 50)
@@ -101,9 +110,28 @@ while running:
         screen.blit(start_button_img, button_pos)
         
         
+    # says game over
+    #brings us back to start screen
 
     else:
         screen.blit(score_text, (x_centered, y_top))
+        quit_button.draw_button()
+        lives_tracker.draw()
+        
+        if lives_tracker.lives == 0:
+            font_game_over = pygame.font.Font(None, 100)
+            game_over_text = font_game_over.render("Game Over", True, (255, 0, 0))  # Red color
+            game_over_rect = game_over_text.get_rect(center=(screen_width // 2, screen_height // 2))
+            screen.blit(game_over_text, game_over_rect)
+            
+            game_over_display_time = pygame.time.get_ticks()
+
+            while pygame.time.get_ticks() - game_over_display_time < 3000:
+                pygame.display.update()
+            
+            game_started = False
+            pygame.mixer.music.stop()
+
         
         left_arrow_position += left_arrow_speed
         up_arrow_position += up_arrow_speed
@@ -113,18 +141,30 @@ while running:
         if left_arrow_position > screen_height:
             left_arrow_position = random.randint(-600, -100)
             left_arrow_speed = random.randint(1, 4) * difficulty
+            if left_scored == False:
+                lives_tracker.lose_life()
+            left_scored = False
 
         if up_arrow_position > screen_height:
             up_arrow_position = random.randint(-600, -100)
             up_arrow_speed = random.randint(1, 4) * difficulty
+            if up_scored == False:
+                lives_tracker.lose_life()
+            up_scored = False
 
         if right_arrow_position > screen_height:
             right_arrow_position = random.randint(-600, -100)
             right_arrow_speed = random.randint(1, 4) * difficulty
+            if right_scored == False:
+                lives_tracker.lose_life()
+            right_scored = False
 
         if down_arrow_position > screen_height:
             down_arrow_position = random.randint(-600, -100)
             down_arrow_speed = random.randint(1, 4) * difficulty
+            if down_scored == False:
+                lives_tracker.lose_life()
+            down_scored = False
 
         screen.blit(left_arrow, (150, left_arrow_position))
         screen.blit(up_arrow, (500, up_arrow_position))
@@ -136,7 +176,7 @@ while running:
     # pygame.draw.rect(screen, 'Pink', text_rect,10)
     
 
-    BOTTOM_ARROW_COLORS = ['dark green', 'purple', (0, 0, 255), (255, 255, 0)]
+    BOTTOM_ARROW_COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
     rectangles = draw_bottom_boxes(screen, screen_width, screen_height, BOTTOM_ARROW_COLORS, 8)
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
@@ -149,13 +189,6 @@ while running:
     x_centered = (screen_width - score_text_width) // 2
     y_top = 20
     
-
-    left_arrow_collided = False
-    up_arrow_collided = False
-    right_arrow_collided = False
-    down_arrow_collided = False
-    
-
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -165,27 +198,36 @@ while running:
             
             
 
-            if event.key==pygame.K_UP and rectangles[1].collidepoint((500, up_arrow_position)):
+            if event.key==pygame.K_UP and rectangles[1].collidepoint((500, up_arrow_position)) and not up_scored:
                 score += 1
                 difficulty += .1
+                up_scored = True
 
-            elif event.key==pygame.K_RIGHT and rectangles[3].collidepoint((1200, right_arrow_position)):
+            elif event.key==pygame.K_RIGHT and rectangles[3].collidepoint((1200, right_arrow_position)) and not right_scored:
              score += 1
              difficulty += .1
+             right_scored = True
              
-            elif event.key==pygame.K_DOWN and rectangles[2].collidepoint((850, down_arrow_position)):
+            elif event.key==pygame.K_DOWN and rectangles[2].collidepoint((850, down_arrow_position)) and not down_scored:
              score += 1
              difficulty += .1
+             down_scored = True
                 
-            elif event.key==pygame.K_LEFT and rectangles[0].collidepoint((150, left_arrow_position)):
+            elif event.key==pygame.K_LEFT and rectangles[0].collidepoint((150, left_arrow_position)) and not left_scored:
              score += 1
              difficulty += .1
+             left_scored = True
 
-        elif event.type == pygame.MOUSEBUTTONDOWN and start_button.collidepoint(event.pos):
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if start_button.collidepoint(event.pos):
+                game_started = True
+                pygame.mixer.music.play()
             
-            game_started = True
+            elif quit_button.is_clicked(event.pos):
+                game_started = False
+                pygame.mixer.music.stop()
             
-            pygame.mixer.music.play()
+        
 
 
     pygame.display.update()
