@@ -1,6 +1,4 @@
 import pygame 
-import sys
-
 from bottom_boxes import draw_bottom_boxes
 from arrow import Arrow
 import random
@@ -50,8 +48,12 @@ game_started = False
 score = 0
 running = True
 
+#Streak
+streak = 0
+show_streak_message = False
+streak_message_display_time = 0
 
-
+#LOADING ARROW IMAGES 
 left_arrow = pygame.image.load("arrowLeft.png").convert_alpha()
 up_arrow = pygame.image.load('arrowUp.png').convert_alpha()
 right_arrow = pygame.image.load("arrowRight.png").convert_alpha()
@@ -61,32 +63,14 @@ start_button_img = pygame.image.load('start3.png')
 button_pos = (screen_width // 2 - start_button_img.get_width() // 2, screen_height // 2 - start_button_img.get_height() // 2)
 
 
-
-
 background_image = pygame.image.load('Space_Background3.png').convert()
 background_image = pygame.transform.scale(background_image, (relative_width, relative_height))
 
 background_surface.blit(background_image, (0, 0))
 
+#INITIAL ARROW POSITIONS 
 
-left_arrow_position = random.randint(-200, -100)
-left_arrow_speed = random.randint(2, 6)
 
-right_arrow_position = random.randint(-200, -100)
-right_arrow_speed = random.randint(2, 6)
-
-down_arrow_position = random.randint(-200, -100)
-down_arrow_speed = random.randint(2, 6)
-
-up_arrow_position = random.randint(-200, -100)
-up_arrow_speed = random.randint(2, 6)
-
-# left_arrow_position %= screen_height
-# up_arrow_position %= screen_height
-# down_arrow_position %= screen_height
-# right_arrow_position %= screen_height
-
-difficulty = 1
 
 quit_button = QuitButton(screen)
 lives_tracker = LivesTracker(screen)
@@ -98,20 +82,34 @@ down_scored = False
 up_scored = False
 
 
+
 while running:
     screen.blit(background_surface,(0,0))
 
     if not game_started:
+
+        score = 0
         
-        
+
+        left_arrow_position = random.randint(-300, -200)
+        left_arrow_speed = random.randint(2, 3)
+
+        right_arrow_position = random.randint(-800, -300)
+        right_arrow_speed = random.randint(2, 3)
+
+        down_arrow_position = random.randint(-900, -400)
+        down_arrow_speed = random.randint(2, 3)
+
+        up_arrow_position = random.randint(-1000, -500)
+        up_arrow_speed = random.randint(2, 3)
+
+        difficulty = 1
+        lives_tracker = LivesTracker(screen)
         caption_img = pygame.image.load('codecode.png')
         caption_pos = (screen_width // 2 - caption_img.get_width() // 2, 50)
         screen.blit(caption_img,caption_pos)
         screen.blit(start_button_img, button_pos)
         
-        
-    # says game over
-    #brings us back to start screen
 
     else:
         screen.blit(score_text, (x_centered, y_top))
@@ -132,54 +130,54 @@ while running:
             game_started = False
             pygame.mixer.music.stop()
 
-        
+#SETTING ARROW POSITIONS TO THEIR SPEED 
+
         left_arrow_position += left_arrow_speed
         up_arrow_position += up_arrow_speed
         down_arrow_position += down_arrow_speed
         right_arrow_position += right_arrow_speed
 
+#IF STATEMENTS TO SET ARROW POSITIONS BACK TO TOP AFTER FALLING TO BOTTOM 
         if left_arrow_position > screen_height:
-            left_arrow_position = random.randint(-600, -100)
-            left_arrow_speed = random.randint(1, 4) * difficulty
+            left_arrow_position = random.randint(-600, -150)
+            left_arrow_speed = random.randint(1, 2) * difficulty
             if left_scored == False:
                 lives_tracker.lose_life()
             left_scored = False
 
         if up_arrow_position > screen_height:
-            up_arrow_position = random.randint(-600, -100)
-            up_arrow_speed = random.randint(1, 4) * difficulty
+            up_arrow_position = random.randint(-600, -150)
+            up_arrow_speed = random.randint(1, 2) * difficulty
             if up_scored == False:
                 lives_tracker.lose_life()
             up_scored = False
 
         if right_arrow_position > screen_height:
-            right_arrow_position = random.randint(-600, -100)
-            right_arrow_speed = random.randint(1, 4) * difficulty
+            right_arrow_position = random.randint(-600, -150)
+            right_arrow_speed = random.randint(1, 2) * difficulty
             if right_scored == False:
                 lives_tracker.lose_life()
             right_scored = False
 
         if down_arrow_position > screen_height:
-            down_arrow_position = random.randint(-600, -100)
-            down_arrow_speed = random.randint(1, 4) * difficulty
+            down_arrow_position = random.randint(-600, -150)
+            down_arrow_speed = random.randint(1, 2) * difficulty
             if down_scored == False:
                 lives_tracker.lose_life()
             down_scored = False
 
+
+#BLIT ARROWS ON SCREEN 
         screen.blit(left_arrow, (150, left_arrow_position))
         screen.blit(up_arrow, (500, up_arrow_position))
         screen.blit(down_arrow, (850, down_arrow_position))
         screen.blit(right_arrow, (1200, right_arrow_position))
 
     
-    # pygame.draw.rect(screen, 'Pink', text_rect)
-    # pygame.draw.rect(screen, 'Pink', text_rect,10)
-    
 
-    BOTTOM_ARROW_COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
-    rectangles = draw_bottom_boxes(screen, screen_width, screen_height, BOTTOM_ARROW_COLORS, 8)
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
+    bottom_box_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
+    rectangles = draw_bottom_boxes(screen, screen_width, screen_height, bottom_box_colors, 8)
+  
 
     font_path = "nova.ttf" 
     font = pygame.font.Font(font_path, 72)
@@ -189,34 +187,57 @@ while running:
     x_centered = (screen_width - score_text_width) // 2
     y_top = 20
     
-    
+    # EVENT LOOP FOR ARROW AND HITBOX COLLIDING
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
         elif event.type == pygame.KEYDOWN and game_started:
+        
             
-            
-
-            if event.key==pygame.K_UP and rectangles[1].collidepoint((500, up_arrow_position)) and not up_scored:
-                score += 1
-                difficulty += .1
-                up_scored = True
-
-            elif event.key==pygame.K_RIGHT and rectangles[3].collidepoint((1200, right_arrow_position)) and not right_scored:
-             score += 1
-             difficulty += .1
-             right_scored = True
-             
-            elif event.key==pygame.K_DOWN and rectangles[2].collidepoint((850, down_arrow_position)) and not down_scored:
-             score += 1
-             difficulty += .1
-             down_scored = True
+            if event.key==pygame.K_UP:
+                if rectangles[1].collidepoint((500, up_arrow_position + 50 )) and not up_scored:
+                    score += 1
+                    difficulty += .075
+                    up_scored = True 
+                    streak += 1
+                    pygame.draw.rect(screen, "white", rectangles[1])
                 
-            elif event.key==pygame.K_LEFT and rectangles[0].collidepoint((150, left_arrow_position)) and not left_scored:
-             score += 1
-             difficulty += .1
-             left_scored = True
+
+            elif event.key==pygame.K_RIGHT and rectangles[3].collidepoint((1200, right_arrow_position + 50)) and not right_scored:
+                score += 1
+                difficulty += .075
+                right_scored = True
+                streak += 1
+                pygame.draw.rect(screen, "white", rectangles[3])
+             
+            elif event.key==pygame.K_DOWN and rectangles[2].collidepoint((850, down_arrow_position + 50)) and not down_scored:
+                score += 1
+                difficulty += .075
+                down_scored = True
+                streak += 1
+                pygame.draw.rect(screen, "white", rectangles[2])
+                
+            elif event.key==pygame.K_LEFT and rectangles[0].collidepoint((150, left_arrow_position + 50)) and not left_scored:
+                score += 1
+                difficulty += .075
+                left_scored = True
+                streak += 1
+                pygame.draw.rect(screen, "white", rectangles[0])
+             
+
+            if streak % 10==0 and streak >0 and not show_streak_message:
+                    show_streak_message = True
+                    streak_message_display_time = pygame.time.get_ticks() 
+                    lives_tracker.gain_life()
+                    
+
+                
+            if show_streak_message and pygame.time.get_ticks() - streak_message_display_time > 75:
+                show_streak_message = False
+                    
+                    
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if start_button.collidepoint(event.pos):
@@ -226,7 +247,13 @@ while running:
             elif quit_button.is_clicked(event.pos):
                 game_started = False
                 pygame.mixer.music.stop()
-            
+
+    if show_streak_message:
+        font_streak_message = pygame.font.Font(font_path, 50)
+        streak_message_text = font_streak_message.render("10 Streak! +1 life", True, 'pink')
+        streak_message_rect = streak_message_text.get_rect(center=(screen_width // 2, screen_height // 2))
+        screen.blit(streak_message_text, streak_message_rect)
+
         
 
 

@@ -1,11 +1,15 @@
 import pygame
 
+
 class LivesTracker:
+
+    font_path = "nova.ttf" 
+
     def __init__(self, screen, initial_lives=10):
         self.screen = screen
         self.lives = initial_lives
         self.font = pygame.font.Font(None, 36)
-        self.text_color = (255, 255, 255)  # White color for lives
+        self.text_color = 'white'  
         self._prep_text()
 
     def _prep_text(self):
