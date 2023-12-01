@@ -49,7 +49,7 @@ score = 0
 running = True
 
 #Streak
-streak = 0
+
 show_streak_message = False
 streak_message_display_time = 0
 
@@ -89,6 +89,7 @@ while running:
     if not game_started:
 
         score = 0
+        streak = 0
         
 
         left_arrow_position = random.randint(-300, -200)
@@ -246,6 +247,8 @@ while running:
             
             elif quit_button.is_clicked(event.pos):
                 game_started = False
+                streak = 0
+                show_streak_message = False
                 pygame.mixer.music.stop()
 
     if show_streak_message:
